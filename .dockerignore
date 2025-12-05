@@ -1,0 +1,23 @@
+.git/
+*.pyc
+*.pyo
+
+.vscode
+.idea
+.DS_Store
+staticfiles/
+
+# Virtual environments
+.venv
+.envs/*
+
+
+# Python-generated files
+.python-version
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+logs/

@@ -1,0 +1,13 @@
+run:
+    uv run python manage.py runserver
+
+run docker:
+    docker network create banker_local_nw
+
+
+local.yml:
+    docker compose -f local.yml config
+    docker compose -f local.yml up --build -d --remove-orphans
+
+
+local/django/Dockerfile:

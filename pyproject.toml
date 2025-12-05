@@ -1,0 +1,32 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "argon2-cffi>=25.1.0",
+    "cloudinary>=1.44.1",
+    "django>=5.2.6",
+    "django-celery-beat>=2.8.1",
+    "django-celery-email>=3.0.0",
+    "django-countries>=7.6.1",
+    "django-filter>=25.1",
+    "django-phonenumber-field>=8.1.0",
+    "djangorestframework>=3.16.1",
+    "djoser>=2.3.3",
+    "drf-spectacular>=0.28.0",
+    "loguru>=0.7.3",
+    "phonenumbers>=9.0.13",
+    "pillow>=11.3.0",
+    "psycopg2-binary>=2.9.10",
+    "python-dateutil>=2.9.0.post0",
+    "python-dotenv>=1.1.1",
+    "setuptools>=80.9.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "watchfiles>=1.1.0",
+]

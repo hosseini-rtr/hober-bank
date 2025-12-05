@@ -1,0 +1,7 @@
+{% extends 'emails/base.html' %} {% block title %} Your login OTP! {% endblock
+title %} {% block content %}
+<h2>One time password</h2>
+<p>Your otp is <strong>{{otp}}</strong></p>
+<p>Expire Time is: {{expiry_time}}</p>
+<p><strong> The {{site_name}} Team </strong></p>
+{% endblock content %}
