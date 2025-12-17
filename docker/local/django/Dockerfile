@@ -45,9 +45,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 # Add non-root user
 RUN addgroup --system django && \
     adduser --system --ingroup django django && \
-    mkdir -p ${APP_HOME}/staticfiles && \
-    chown django:django ${APP_HOME}/staticfiles && \
-    chmod 775 ${APP_HOME}/staticfiles
+    mkdir -p ${APP_HOME}/staticfiles ${APP_HOME}/logs && \
+    chown django:django ${APP_HOME}/staticfiles ${APP_HOME}/logs && \
+    chmod 775 ${APP_HOME}/staticfiles ${APP_HOME}/logs
 
 # Copy installed deps + app from build stage
 COPY --from=python-build-stage /usr/local /usr/local

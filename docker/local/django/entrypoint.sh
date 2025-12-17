@@ -7,22 +7,24 @@ python <<END
 import sys
 import time
 import psycopg2
+import os
 
-suggest_unrecoverable_after = 30
+suggest_unrecoverable_after = 5
 start = time.time()
 
 while True:
     try:
         psycopg2.connect(
-            dbname="${POSTGRES_DB}",
-            user="${POSTGRES_USER}",
-            password="${POSTGRES_PASSWORD}",
-            host="${POSTGRES_HOST}",
-            port="${POSTGRES_PORT}",
+            dbname=os.environ["POSTGRES_DB"],
+            user=os.environ["POSTGRES_USER"],
+            password=os.environ["POSTGRES_PASSWORD"],
+            host=os.environ["POSTGRES_HOST"],
+            port=os.environ["POSTGRES_PORT"],
         )
+        print(f"Connected to {os.environ['POSTGRES_DB']} as {os.environ['POSTGRES_USER']}")
         break
     except psycopg2.OperationalError as e:
-        sys.stderr.write(" ** waiting for PSQL to be available ** \n")
+        sys.stderr.write(f" ** waiting for PSQL to be available ** {time.time() - start} \n")
         if time.time() - start > suggest_unrecoverable_after:
             sys.stderr.write(f"This is taking longer than expected. The following exception indicative of an unrecoverable error:{e} \n ")
         time.sleep(3)

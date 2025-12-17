@@ -30,5 +30,5 @@ network-inspect:
 	docker network inspect banker_local_nw
 
 banker-db:
-	docker compose -f local.yml exec postgres psql --username=banker --dbname=banker
+	docker compose -f local.yml exec postgres psql --username=ur_hober_bank --dbname=db_hober_bank
 
