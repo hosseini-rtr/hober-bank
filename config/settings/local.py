@@ -35,5 +35,5 @@ MAX_UPLOAD_SIZE = getenv("MAX_UPLOAD_SIZE")
 CSRF_TRUSTED_ORIGIN = ["http://localhost:8080"]
 
 LOCKOUT_DURATION = timedelta(days=1)
-LOGGING_ATTEMPTS = 3
+MAX_OTP_ATTEMPTS = 3
 OTP_EXPIRATION = timedelta(minutes=2)
