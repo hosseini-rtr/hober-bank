@@ -1,3 +1,4 @@
+import random
 import uuid
 
 from django.conf import settings
@@ -35,11 +36,13 @@ class User(AbstractUser):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, db_index=True
     )
-    username = models.CharField(_("Username"), max_length=12, unique=True)
+    username = models.CharField(
+        _("Username"), max_length=12, unique=True, editable=False
+    )
     security_question = models.CharField(
         _("Security Question"), max_length=150, choices=SecurityQuestion.choices
     )
-    security_ans_hash = models.CharField(max_length=128)
+    security_answer = models.CharField(max_length=128)
     email = models.EmailField(_("Email"), unique=True, db_index=True)
     first_name = models.CharField(_("First name"), max_length=30)
     middle_name = models.CharField(
@@ -66,17 +69,17 @@ class User(AbstractUser):
     login_attempts = models.PositiveSmallIntegerField(default=0)
 
     objects = UserManager()
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = [
-        "email",
         "first_name",
         "last_name",
+        "id_number",
         "security_question",
-        "security_ans_hash",
+        "security_answer",
     ]
 
     def set_otp(self):
-        otp = generate_otp()
+        otp = f"{random.randint(100000, 999999)}"
         self.otp_hash = make_password(otp)
         self.otp_expiry_time = timezone.now() + settings.OTP_EXPIRATION
         self.login_attempts = 0
@@ -111,11 +114,11 @@ class User(AbstractUser):
 
     def set_security_answer(self, answer: str):
         normalized = answer.strip().lower()
-        self.security_ans_hash = make_password(normalized)
+        self.security_answer = make_password(normalized)
 
     def verify_security_answer(self, answer: str) -> bool:
         normalized = answer.strip().lower()
-        return check_password(normalized, self.security_ans_hash)
+        return check_password(normalized, self.security_answer)
 
     def handle_failed_login_attempts(self) -> None:
         self.login_attempts += 1
@@ -126,7 +129,7 @@ class User(AbstractUser):
         send_account_locked_email(self)
         self.save(update_fields=["login_attempts", "last_failed_login"])
 
-    def reset_failed__login_attempts(self):
+    def reset_failed_login_attempts(self):
         self.login_attempts = 0
         self.last_failed_login = None
         self.account_status = self.AccountStatus.ACTIVE
@@ -156,7 +159,9 @@ class User(AbstractUser):
 
     @property
     def full_name(self) -> str:
-        full_name = f"{self.first_name} {self.middle_name} {self.last_name}"
+        full_name = " ".join(
+            part for part in [self.first_name, self.middle_name, self.last_name] if part
+        )
         return full_name.title().strip()
 
     class Meta:

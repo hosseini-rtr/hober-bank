@@ -43,6 +43,10 @@ class UserManager(DjangoUserManager):
 
         user = self.model(username=username, email=email, **other_fields)
         user.password = make_password(password)
+        security_answer = other_fields.pop("security_answer", None)
+        if security_answer:
+            user.set_security_answer(security_answer)
+
         user.save(using=self._db)
 
     def create_user(
