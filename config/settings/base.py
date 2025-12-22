@@ -50,6 +50,7 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "core_apps.user_auth.middleware.CustomHeaderMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -146,9 +148,19 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = "user_app.User"
+AUTH_USER_MODEL = "user_auth.User"
 
 LOGGING_CONFIG = None
+
+REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Hober Bank",
+    "VERSION": "0.0.1",
+    "DESCRIPTION": "Hober Bank's API",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "LICENSE": {"name": "MIT License", "url": "https://github.com/hosseini-rtr"},
+}
+
 LOGURU_LOGGING = {
     "handlers": [
         {
