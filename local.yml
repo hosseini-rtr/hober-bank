@@ -1,5 +1,6 @@
 services:
   api: &api
+    user: "${UID}:${GID}"
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
@@ -7,10 +8,13 @@ services:
       - .:/app:z
       - hober_staticfiles:/app/staticfiles
       - hober_logs:/app/logs
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
+    expose:
+      - "8000"
     env_file:
       - ./.envs/.env.local
+      - ./.envs/.env
     depends_on:
       - postgres
       - mailpit
@@ -26,6 +30,7 @@ services:
       - "5432:5432"
     env_file:
       - ./.envs/.env.local
+      - ./.envs/.env
     volumes:
       - banker_local_db:/var/lib/postgresql/data
     networks:
@@ -45,6 +50,20 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - banker_local_nw
+  nginx:
+    build:
+      context: ./docker/local/nginx
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./staticfiles:/app/staticfiles
+      - logs_store:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - banker_local_nw
 
 networks:
   banker_local_nw:
@@ -55,3 +74,4 @@ volumes:
   banker_mailpit_db:
   hober_logs:
   hober_staticfiles:
+  logs_store:

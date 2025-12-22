@@ -42,12 +42,15 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
-# Add non-root user
-RUN addgroup --system django && \
-    adduser --system --ingroup django django && \
+# Add non-root user (match host UID/GID)
+ARG UID=1000
+ARG GID=1000
+
+RUN addgroup --gid ${GID} django && \
+    adduser --uid ${UID} --gid ${GID} --disabled-password django && \
     mkdir -p ${APP_HOME}/staticfiles ${APP_HOME}/logs && \
-    chown django:django ${APP_HOME}/staticfiles ${APP_HOME}/logs && \
-    chmod 775 ${APP_HOME}/staticfiles ${APP_HOME}/logs
+    chown -R django:django ${APP_HOME}
+
 
 # Copy installed deps + app from build stage
 COPY --from=python-build-stage /usr/local /usr/local

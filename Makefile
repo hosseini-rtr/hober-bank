@@ -32,3 +32,11 @@ network-inspect:
 banker-db:
 	docker compose -f local.yml exec postgres psql --username=ur_hober_bank --dbname=db_hober_bank
 
+create-test-superuser:
+	docker compose -f local.yml run --rm api \
+	python manage.py create_test_superuser
+
+portainer:
+	docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	-v portainer_data:/data portainer/portainer-ce:lts
