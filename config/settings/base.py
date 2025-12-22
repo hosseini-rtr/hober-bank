@@ -150,9 +150,9 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "user_auth.User"
 
-LOGGING_CONFIG = None
 
 REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"}
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "Hober Bank",
     "VERSION": "0.0.1",
@@ -160,6 +160,24 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "LICENSE": {"name": "MIT License", "url": "https://github.com/hosseini-rtr"},
 }
+
+if USE_TZ:
+    CELERY_TIMEZONE = USE_TZ
+
+CELERY_BROKER_URL = getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_RESULT_BACKEND_MAX_RETRIES = 10
+CELERY_TASK_SEND_SENT_EVEN = True
+CELERY_RESULT_EXTENDED = True
+CELERY_RESULT_ALWAYS_RETRY = True
+CELERY_TASK_TIME_LIMIT = 5 * 60
+CELERY_TASK_SOFT_TIME_LIMIT = 5 * 60
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_WORKER_SEND_TASK_EVENTS = True
+
 
 LOGURU_LOGGING = {
     "handlers": [
@@ -187,6 +205,8 @@ LOGURU_LOGGING = {
 }
 
 logger.configure(**LOGURU_LOGGING)
+
+LOGGING_CONFIG = None
 
 LOGGING = {
     "version": 1,
