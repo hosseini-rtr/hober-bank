@@ -96,6 +96,19 @@ services:
     networks:
       - banker_local_nw
 
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - ./.envs/.env.local
+    volumes:
+      - minio_data:/data
+    networks:
+      - banker_local_nw
+
   nginx:
     build:
       context: ./docker/local/nginx
@@ -124,3 +137,4 @@ volumes:
   rabbitmq_data:
   rabbitmq_log:
   flower_db:
+  minio_data:

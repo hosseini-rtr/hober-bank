@@ -179,6 +179,40 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_WORKER_SEND_TASK_EVENTS = True
 
 
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": "banker",
+            "access_key": getenv("MINIO_ROOT_USER"),
+            "secret_key": getenv("MINIO_ROOT_PASSWORD"),
+            "endpoint_url": "http://minio:9000",
+            "region_name": "us-east-1",
+            "use_ssl": False,
+            "verify": False,
+            "addressing_style": "path",
+            "file_overwrite": False,
+        },
+    },
+    "celery": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": "banker",
+            "access_key": getenv("MINIO_ROOT_USER"),
+            "secret_key": getenv("MINIO_ROOT_PASSWORD"),
+            "endpoint_url": "http://minio:9000",
+            "region_name": "us-east-1",
+            "use_ssl": False,
+            "verify": False,
+            "addressing_style": "path",
+            "location": "celery",
+            "file_overwrite": False,
+            "default_acl": "private",
+        },
+    },
+}
+
+
 LOGURU_LOGGING = {
     "handlers": [
         {
