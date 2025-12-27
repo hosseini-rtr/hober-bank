@@ -8,8 +8,6 @@ from django.db import IntegrityError, models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
-
 User = get_user_model()
 
 
