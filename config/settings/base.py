@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from os import getenv, path
 from pathlib import Path
 
@@ -183,7 +184,7 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "bucket_name": "banker",
+            "bucket_name": getenv("MINIO_BUCKET", "banker"),
             "access_key": getenv("MINIO_ROOT_USER"),
             "secret_key": getenv("MINIO_ROOT_PASSWORD"),
             "endpoint_url": "http://minio:9000",
@@ -248,3 +249,9 @@ LOGGING = {
     "handlers": {"loguru": {"class": "interceptor.InterceptHandler"}},
     "root": {"handlers": ["loguru"], "level": "DEBUG"},
 }
+
+
+DEFAULT_DATE = date.today()
+DEFAULT_EXPIRY = date.today() + timedelta(days=365)
+DEFAULT_COUNTRY = "AE"  # United Arab Emirates
+DEFAULT_PHONE_NUMBER = "+971500000000"
