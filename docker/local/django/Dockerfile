@@ -12,13 +12,16 @@ RUN pip install --no-cache-dir uv
 
 WORKDIR /app
 
-# Copy deps first (better cache)
+# Copy only dependency files first for better layer caching
 COPY pyproject.toml uv.lock ./
 
-# Install deps system-wide
-RUN uv pip install --system --no-cache .
+# Create virtual environment and install dependencies
+# This layer will be cached unless pyproject.toml or uv.lock changes
+RUN uv venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    uv pip install --no-cache-dir --compile-bytecode --link-mode=copy .
 
-# Copy source
+# Copy source code (this will invalidate cache only when source changes)
 COPY . .
 
 
@@ -52,9 +55,12 @@ RUN addgroup --gid ${GID} django && \
     chown -R django:django ${APP_HOME}
 
 
-# Copy installed deps + app from build stage
-COPY --from=python-build-stage /usr/local /usr/local
+# Copy virtual environment and app from build stage
+COPY --from=python-build-stage /opt/venv /opt/venv
 COPY --from=python-build-stage /app /app
+
+# Activate virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Entrypoint scripts
 COPY --chown=django:django ./docker/local/django/entrypoint.sh /entrypoint.sh
