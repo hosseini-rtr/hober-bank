@@ -1,10 +1,10 @@
-import uuid
 from typing import Any
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -16,7 +16,7 @@ from .utils import user_photo_path, user_signature_path
 User = get_user_model()
 
 
-# Party = Owner of rights
+# Party : Owner of rights
 class Party(TimeStampedModel):
     class PartyType(models.TextChoices):
         INDIVIDUAL = "individual", _("Individual")
@@ -57,6 +57,13 @@ class PartyUserRole(models.Model):
     valid_to = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["party"],
+                condition=models.Q(role="OWNER", is_active=True),
+                name="unique_active_owner_per_party",
+            )
+        ]
         unique_together = ("party", "user", "role")
 
     def __str__(self):
@@ -64,6 +71,21 @@ class PartyUserRole(models.Model):
 
 
 class IndividualProfile(TimeStampedModel):
+    class SalutationChoices(models.TextChoices):
+        MR = ("Mr", _("Mr"))
+        MS = ("Ms", _("Ms"))
+        DR = ("Dr", _("Dr"))
+        PROF = ("Prof", _("Prof"))
+
+    class GenderChoices(models.TextChoices):
+        MALE = ("male", _("Male"))
+        FEMALE = ("female", _("Female"))
+
+    class IdentificationTypeChoices(models.TextChoices):
+        PASSPORT = ("passport", _("Passport"))
+        NATIONAL_ID = ("national_id", _("National ID"))
+        DRIVER_LICENSE = ("driver_license", _("Driver's License"))
+
     party = models.OneToOneField(
         Party,
         on_delete=models.CASCADE,
@@ -89,6 +111,13 @@ class IndividualProfile(TimeStampedModel):
     signature = models.ImageField(upload_to=user_signature_path)
 
     fraud_alert = models.BooleanField(default=False)
+
+    def clean(self):
+        super().clean()
+        if self.party.party_type != Party.PartyType.INDIVIDUAL:
+            raise ValidationError(
+                _("IndividualProfile requires party_type to be INDIVIDUAL")
+            )
 
     def __str__(self):
         return f"IndividualProfile({self.party_id})"
@@ -147,7 +176,8 @@ class NextOfKin(TimeStampedModel):
                 raise ValidationError(
                     {
                         "is_primary": _(
-                            "There is already a primary next of kin for this profile."
+                            "There is already a primary \
+                                next of kin for this profile."
                         )
                     }
                 )
