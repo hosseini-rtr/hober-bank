@@ -13,6 +13,10 @@ local_env_file = path.join(BASE_DIR, ".envs", ".env.local")
 if path.isfile(local_env_file):
     load_dotenv(local_env_file)
 
+# Ensure logs directory exists with proper permissions
+LOGS_DIR = BASE_DIR / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -195,6 +199,9 @@ STORAGES = {
             "file_overwrite": False,
         },
     },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
     "celery": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
@@ -239,7 +246,12 @@ LOGURU_LOGGING = {
     ],
 }
 
-logger.configure(**LOGURU_LOGGING)
+# Configure logger with error handling for permission issues
+try:
+    logger.configure(**LOGURU_LOGGING)
+except PermissionError:
+    # Fallback to console logging if file logging fails
+    logger.configure(handlers=[{"level": "INFO", "sink": "sys.stderr"}])
 
 LOGGING_CONFIG = None
 
