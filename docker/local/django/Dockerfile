@@ -59,6 +59,9 @@ RUN addgroup --gid ${GID} django && \
 COPY --from=python-build-stage /opt/venv /opt/venv
 COPY --from=python-build-stage /app /app
 
+# Ensure proper permissions after copying
+RUN chown -R django:django ${APP_HOME}
+
 # Activate virtual environment
 ENV PATH="/opt/venv/bin:$PATH"
 

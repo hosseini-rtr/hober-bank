@@ -117,7 +117,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./staticfiles:/app/staticfiles
+      - hober_staticfiles:/app/staticfiles
       - logs_store:/var/log/nginx
     depends_on:
       - api
